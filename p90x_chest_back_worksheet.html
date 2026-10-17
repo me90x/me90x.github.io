@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chest & Back — Interactive Worksheet</title>
+<style>
+  :root {
+    --bg: #121417;
+    --panel: #1c2026;
+    --panel2: #23282f;
+    --text: #e8eaed;
+    --dim: #9aa3ad;
+    --accent: #f5a623;
+    --accent2: #4fa3ff;
+    --done: #2e7d4f;
+    --border: #2e353d;
+    --chest: #e05a4e;
+    --back: #4fa3ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    padding-bottom: 4rem;
+  }
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0.8rem 1rem;
+  }
+  h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.02em; }
+  h1 .disc { color: var(--dim); font-weight: 400; font-size: 0.9rem; }
+  #progWrap {
+    margin-top: 0.5rem; height: 8px;
+    background: var(--panel2); border-radius: 4px; overflow: hidden;
+  }
+  #progBar { height: 100%; width: 0%; background: var(--done); transition: width 0.25s; }
+  #progText { font-size: 0.78rem; color: var(--dim); margin-top: 0.3rem; }
+  main { max-width: 760px; margin: 0 auto; padding: 1rem; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+  button {
+    background: var(--panel2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.45rem 0.8rem; font-size: 0.83rem; cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--done); border-color: var(--done); color: #fff; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 1rem; overflow: hidden;
+  }
+  .panel h2 {
+    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--dim); padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid var(--border); background: var(--panel2);
+  }
+  details.globals { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; }
+  details.globals summary { padding: 0.7rem 0.9rem; cursor: pointer; font-size: 0.85rem; color: var(--dim); list-style: none; }
+  details.globals summary::before { content: "▸ "; }
+  details.globals[open] summary::before { content: "▾ "; }
+  .globals-body { padding: 0 0.9rem 0.9rem; display: grid; gap: 0.5rem; }
+  .gswap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; align-items: center; font-size: 0.85rem; }
+  select, input[type="text"], input[type="number"] {
+    background: var(--panel2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 5px;
+    padding: 0.35rem 0.5rem; font-size: 0.83rem; width: 100%;
+  }
+  select:focus, input:focus { outline: none; border-color: var(--accent2); }
+
+  .row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.6rem; align-items: center;
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .row:last-child { border-bottom: none; }
+  .row.done { background: rgba(46,125,79,0.13); }
+  .row.done .ex-name { color: var(--dim); text-decoration: line-through; }
+  input[type="checkbox"].tick {
+    width: 22px; height: 22px; accent-color: var(--done); cursor: pointer;
+  }
+  .ex-head { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .badge {
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em;
+    padding: 0.15rem 0.4rem; border-radius: 4px; color: #fff;
+  }
+  .badge.chest { background: var(--chest); }
+  .badge.back { background: var(--back); }
+  .ex-name { font-weight: 600; font-size: 0.95rem; }
+  .replaces { font-size: 0.72rem; color: var(--accent); }
+  .tag-slot { font-size: 0.72rem; color: var(--dim); min-width: 1.6em; }
+
+  details.more { grid-column: 1 / -1; }
+  details.more summary {
+    cursor: pointer; font-size: 0.78rem; color: var(--accent2);
+    list-style: none; padding-top: 0.15rem; width: fit-content;
+  }
+  details.more summary::before { content: "▸ "; }
+  details.more[open] summary::before { content: "▾ "; }
+  .more-body { padding: 0.6rem 0 0.2rem; display: grid; gap: 0.6rem; }
+  .cues { font-size: 0.83rem; color: var(--dim); line-height: 1.45; }
+  video {
+    width: 100%; max-height: 320px; background: #000;
+    border-radius: 6px; border: 1px solid var(--border);
+  }
+  .novideo { font-size: 0.78rem; color: var(--dim); font-style: italic; }
+
+  .sw-row { display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap; }
+  .sw-row label { font-size: 0.7rem; color: var(--dim); }
+  .rw-inputs { display: flex; gap: 0.5rem; }
+  .rw-inputs label { font-size: 0.7rem; color: var(--dim); display: block; margin-bottom: 0.15rem; }
+  .rw-inputs input { width: 5.2rem; }
+  .last-note { font-size: 0.72rem; color: var(--dim); }
+
+  .break-row {
+    text-align: center; padding: 0.5rem; font-size: 0.8rem;
+    color: #5ec2ff; background: rgba(79,163,255,0.08);
+    border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border);
+    display: flex; justify-content: center; align-items: center; gap: 0.8rem;
+  }
+  .phase-row {
+    display: flex; align-items: center; gap: 0.7rem;
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 1rem;
+    font-weight: 600; font-size: 0.95rem;
+  }
+  .phase-row .ptime { color: var(--dim); font-weight: 400; font-size: 0.8rem; }
+  .phase-row.done { border-color: var(--done); }
+  #importFile { display: none; }
+  #statusMsg { font-size: 0.78rem; color: var(--dim); margin-left: auto; }
+  .foot-note { font-size: 0.75rem; color: var(--dim); margin-top: 0.5rem; line-height: 1.5; }
+  @media (max-width: 560px) {
+    .row { grid-template-columns: auto 1fr; }
+    .sw-row { grid-column: 1 / -1; justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Chest &amp; Back <span class="disc">· Interactive Worksheet · Disc 1</span></h1>
+  <div id="progWrap"><div id="progBar"></div></div>
+  <div id="progText">0 / 0 complete</div>
+</header>
+<main>
+  <div class="toolbar">
+    <button class="primary" id="finishBtn">Finish &amp; Save Session</button>
+    <button id="clearTicksBtn">Clear Ticks</button>
+    <button id="exportBtn">Export JSON</button>
+    <button id="importBtn">Import JSON</button>
+    <input type="file" id="importFile" accept="application/json">
+    <span id="statusMsg"></span>
+  </div>
+
+  <details class="globals">
+    <summary>Global exercise swaps — change every occurrence in the routine</summary>
+    <div class="globals-body" id="globalsBody"></div>
+  </details>
+
+  <div id="sheet"></div>
+
+  <div class="panel">
+    <h2>Equipment Required</h2>
+    <div class="foot-note" style="padding:0.7rem 0.9rem;">
+      Weights or resistance bands · P90X® Chin-Up Bar (or bands with door attachment,
+      + Chin-Up Max if you struggle with pull-ups) · Bench or chair.
+      R = reps, W = weight.
+    </div>
+  </div>
+
+  <p class="foot-note">
+    Everything is stored in your browser's localStorage. Use Export JSON to back up or
+    move your swaps and history to another device. To add a demonstration clip, name it
+    after the exercise ID (shown under each exercise) and place it next to this file in a
+    <strong>videos/</strong> folder, e.g. <em>videos/dumbbell_bench_press.mp4</em>.
+  </p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // ------------------------------------------------------------------
+  // Exercise library. Add alternatives here as you invent new swaps.
+  // hasWeight: sheet shows a W field for it, so the app shows one too.
+  // ------------------------------------------------------------------
+  const EXERCISES = {
+    standard_pushup:       { name: "Standard Push-Ups", muscle: "chest", group: "Push-Ups", hasWeight: false,
+                             alts: ["dumbbell_bench_press", "incline_pushup", "band_chest_press"],
+                             cues: "Hands just outside shoulders, body rigid, chest to just above the floor, elbows ~45° from the body." },
+    dumbbell_bench_press:  { name: "Dumbbell Bench Press", muscle: "chest", group: "Push-Ups", hasWeight: true, alts: [],
+                             cues: "On a flat bench. Dumbbells start at chest level, press up until arms are extended, lower slowly under control." },
+    incline_pushup:        { name: "Incline Push-Ups", muscle: "chest", group: "Push-Ups", hasWeight: false, alts: [],
+                             cues: "Hands on a bench or chair, body straight. Easier angle — keep the same strict form." },
+    band_chest_press:      { name: "Band Chest Press", muscle: "chest", group: "Push-Ups", hasWeight: true, alts: [],
+                             cues: "Band behind the back, press both ends forward like a push-up motion. Keep tension constant." },
+    military_pushup:       { name: "Military Push-Ups", muscle: "chest", group: "Push-Ups", hasWeight: false,
+                             alts: ["pike_pushup", "dumbbell_shoulder_press"],
+                             cues: "Hands directly under/behind shoulders, elbows tucked tight to the ribs — triceps and shoulders do the work." },
+    pike_pushup:           { name: "Pike Push-Ups", muscle: "chest", group: "Push-Ups", hasWeight: false, alts: [],
+                             cues: "Hips high in a pike, lower the head toward the floor between the hands. Shoulder emphasis." },
+    dumbbell_shoulder_press:{ name: "Dumbbell Shoulder Press", muscle: "chest", group: "Push-Ups", hasWeight: true, alts: [],
+                             cues: "Press from ear level to full extension overhead, core tight, no leaning back." },
+    wide_fly_pushup:       { name: "Wide Fly Push-Ups", muscle: "chest", group: "Push-Ups", hasWeight: false,
+                             alts: ["dumbbell_flyes", "band_flyes"],
+                             cues: "Walk hands out wide on the way down, back in on the way up. Slow and controlled." },
+    dumbbell_flyes:        { name: "Dumbbell Flyes", muscle: "chest", group: "Push-Ups", hasWeight: true, alts: [],
+                             cues: "On a flat bench, slight bend in elbows, open in a wide arc and squeeze the chest at the top." },
+    band_flyes:            { name: "Band Flyes", muscle: "chest", group: "Push-Ups", hasWeight: true, alts: [],
+                             cues: "Band anchored behind you — hug a barrel motion, constant tension throughout." },
+    decline_pushup:        { name: "Decline Push-Ups", muscle: "chest", group: "Push-Ups", hasWeight: false,
+                             alts: ["incline_dumbbell_press"],
+                             cues: "Feet elevated on a bench or chair, hips level, full range on the upper chest." },
+    incline_dumbbell_press:{ name: "Incline Dumbbell Press", muscle: "chest", group: "Push-Ups", hasWeight: true, alts: [],
+                             cues: "Bench at 30-45°. Press from upper-chest level, control the negative." },
+    diamond_pushup:        { name: "Diamond Push-Ups", muscle: "chest", group: "Push-Ups", hasWeight: false,
+                             alts: ["close_grip_bench_press", "bench_dips"],
+                             cues: "Thumbs and index fingers form a diamond under the chest, elbows tucked. Triceps burn." },
+    close_grip_bench_press:{ name: "Close-Grip Bench Press", muscle: "chest", group: "Push-Ups", hasWeight: true, alts: [],
+                             cues: "Hands shoulder-width or slightly narrower, elbows tucked to the ribs." },
+    bench_dips:            { name: "Bench Dips", muscle: "chest", group: "Push-Ups", hasWeight: false, alts: [],
+                             cues: "Hands on a bench behind you, shoulders down, lower until elbows are near 90°." },
+    dive_bomber_pushup:    { name: "Dive-Bomber Push-Ups", muscle: "chest", group: "Push-Ups", hasWeight: false,
+                             alts: ["hindu_pushup", "overhead_press"],
+                             cues: "From downward-dog, swoop the chest down under then up into upward-dog, reverse the path back." },
+    hindu_pushup:          { name: "Hindu Push-Ups", muscle: "chest", group: "Push-Ups", hasWeight: false, alts: [],
+                             cues: "Continuous flowing version of the dive-bomber — straight through without reversing." },
+    overhead_press:        { name: "Standing Overhead Press", muscle: "chest", group: "Push-Ups", hasWeight: true, alts: [],
+                             cues: "Bar or dumbbells from collarbone to locked out overhead." },
+    wide_front_pullup:     { name: "Wide Front Pull-Ups", muscle: "back", group: "Pull-Ups", hasWeight: false,
+                             alts: ["band_lat_pulldown", "bent_over_row"],
+                             cues: "Overhand grip wider than shoulders, chest to the bar, control the descent." },
+    band_lat_pulldown:     { name: "Band Lat Pulldown", muscle: "back", group: "Pull-Ups", hasWeight: true, alts: [],
+                             cues: "Band anchored overhead, kneel and pull the handles to your chest, squeeze the lats." },
+    bent_over_row:         { name: "Bent-Over Dumbbell Row", muscle: "back", group: "Pull-Ups", hasWeight: true, alts: [],
+                             cues: "Hinge at the hips, flat back, row the dumbbells to your lower rib cage." },
+    reverse_grip_chinup:   { name: "Reverse Grip Chin-Ups", muscle: "back", group: "Pull-Ups", hasWeight: false,
+                             alts: ["band_underhand_pulldown", "inverted_row"],
+                             cues: "Underhand grip, chin over the bar, feel the biceps assist the lats." },
+    band_underhand_pulldown:{ name: "Band Underhand Pulldown", muscle: "back", group: "Pull-Ups", hasWeight: true, alts: [],
+                             cues: "Overhead anchor, palms facing up, pull to your sternum." },
+    inverted_row:          { name: "Inverted Rows", muscle: "back", group: "Pull-Ups", hasWeight: false, alts: [],
+                             cues: "Under a sturdy table or low bar, body straight, pull your chest to the edge." },
+    close_grip_pullup:     { name: "Closed Grip Overhand Pull-Ups", muscle: "back", group: "Pull-Ups", hasWeight: false,
+                             alts: ["narrow_band_pulldown", "one_arm_row"],
+                             cues: "Hands close together, overhand. Full hang at the bottom." },
+    narrow_band_pulldown:  { name: "Narrow Band Pulldown", muscle: "back", group: "Pull-Ups", hasWeight: true, alts: [],
+                             cues: "Close overhand grip on the band, pull to the collarbone." },
+    one_arm_row:           { name: "One-Arm Dumbbell Row", muscle: "back", group: "Pull-Ups", hasWeight: true, alts: [],
+                             cues: "Hand and knee on a bench, pull the dumbbell to the hip, squeeze at the top." },
+    heavy_pants:           { name: "Heavy Pants", muscle: "back", group: "Rows/Deadlift", hasWeight: true,
+                             alts: ["dumbbell_deadlift", "kettlebell_swing"],
+                             cues: "Hinge forward flat-backed, row the heavy weights alternately up the thigh." },
+    dumbbell_deadlift:     { name: "Dumbbell Deadlifts", muscle: "back", group: "Rows/Deadlift", hasWeight: true, alts: [],
+                             cues: "Hips back, neutral spine, drive through the heels." },
+    kettlebell_swing:      { name: "Kettlebell Swings", muscle: "back", group: "Rows/Deadlift", hasWeight: true, alts: [],
+                             cues: "Snap the hips through, arms are just ropes. Chest up, back flat." },
+    lawnmowers:            { name: "Lawnmowers", muscle: "back", group: "Rows/Deadlift", hasWeight: true,
+                             alts: ["one_arm_row"],
+                             cues: "Staggered stance, one heavy weight, rip it up like starting a mower. Both sides." },
+    back_flys:             { name: "Back Flys", muscle: "back", group: "Rows/Deadlift", hasWeight: true,
+                             alts: ["reverse_dumbbell_flyes", "band_pull_aparts"],
+                             cues: "Bent forward, light weights, open the arms wide pinching the shoulder blades together." },
+    reverse_dumbbell_flyes:{ name: "Reverse Dumbbell Flyes", muscle: "back", group: "Rows/Deadlift", hasWeight: true, alts: [],
+                             cues: "Hinged at the hips, slight elbow bend, raise the weights out to the sides to shoulder level." },
+    band_pull_aparts:      { name: "Band Pull-Aparts", muscle: "back", group: "Rows/Deadlift", hasWeight: true, alts: [],
+                             cues: "Hold the band at chest height and pull it apart, squeezing the shoulder blades." }
+  };
+
+  // ------------------------------------------------------------------
+  // Routine transcribed from the Chest & Back worksheet image.
+  // Order is fixed — this app never reshuffles it.
+  // w: true on a slot = the sheet shows a weight field for that row.
+  // ------------------------------------------------------------------
+  const ROUTINE = [
+    { type: "phase", label: "Warm-Up", time: "2:30 + 6:30" },
+
+    { base: "standard_pushup" },     { base: "wide_front_pullup" },
+    { base: "military_pushup" },     { base: "reverse_grip_chinup" },
+    { type: "break", time: "0:49" },
+
+    { base: "wide_fly_pushup" },     { base: "close_grip_pullup" },
+    { base: "decline_pushup" },      { base: "heavy_pants" },
+    { type: "break", time: "0:47" },
+
+    { base: "diamond_pushup" },      { base: "lawnmowers" },
+    { base: "dive_bomber_pushup" },  { base: "back_flys" },
+    { type: "break", time: "1:04" },
+
+    { base: "wide_front_pullup" },   { base: "standard_pushup" },
+    { base: "reverse_grip_chinup", w: true }, { base: "military_pushup" },
+    { type: "break", time: "1:00" },
+
+    { base: "close_grip_pullup" },   { base: "wide_fly_pushup" },
+    { base: "heavy_pants" },         { base: "decline_pushup" },
+    { type: "break", time: "0:37" },
+
+    { base: "lawnmowers" },          { base: "diamond_pushup" },
+    { base: "back_flys" },           { base: "dive_bomber_pushup" },
+
+    { type: "phase", label: "Cool Down", time: "3:22" }
+  ];
+
+  const LS_KEY = "p90x-chest-back-v2";
+  let state = loadState();
+  let history = state.history || {};
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) { /* corrupted or blocked storage — start fresh */ }
+    return {
+      completed: {},        // key -> true
+      results: {},          // slotIndex -> { r, w }
+      globalSwaps: {},      // baseId -> altId
+      slotOverrides: {},    // slotIndex -> altId OR "" (use original)
+      history: {}           // exerciseId -> [{ date, r, w }]
+    };
+  }
+
+  function saveState() {
+    state.history = history;
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  // Slot indices: assign a stable index to each exercise entry.
+  let slotCounter = 0;
+  const items = ROUTINE.map(it => {
+    if (it.type) return it;
+    return { type: "ex", slot: slotCounter++, base: it.base, w: !!it.w };
+  });
+
+  function activeIdFor(item) {
+    if (item.slot in state.slotOverrides) {
+      const ov = state.slotOverrides[item.slot];
+      return ov === "" ? item.base : ov;
+    }
+    return state.globalSwaps[item.base] || item.base;
+  }
+
+  const sheetEl = document.getElementById("sheet");
+  const globalsEl = document.getElementById("globalsBody");
+  const statusMsg = document.getElementById("statusMsg");
+
+  function setStatus(msg) {
+    statusMsg.textContent = msg;
+    setTimeout(() => { statusMsg.textContent = ""; }, 3500);
+  }
+
+  let breakIdx = 0; // reset at the start of every render
+
+  // ------------------------- Progress ------------------------------
+  function refreshProgress() {
+    const exItems = items.filter(i => i.type === "ex");
+    const total = exItems.length;
+    const done = exItems.filter(i => state.completed["slot-" + i.slot]).length;
+    document.getElementById("progBar").style.width = total ? (done / total * 100) + "%" : "0%";
+    document.getElementById("progText").textContent = done + " / " + total + " exercises complete";
+  }
+
+  // ---------------------- Global swap panel ------------------------
+  function buildGlobalsPanel() {
+    globalsEl.innerHTML = "";
+    const uniqueBases = [...new Set(items.filter(i => i.type === "ex").map(i => i.base))];
+    uniqueBases.forEach(baseId => {
+      const ex = EXERCISES[baseId];
+      if (!ex || ex.alts.length === 0) {
+        const row = document.createElement("div");
+        row.className = "gswap-row";
+        row.innerHTML = `<span>${ex ? ex.name : baseId}</span><span style="color:var(--dim);font-size:0.75rem;">no alternatives yet</span>`;
+        globalsEl.appendChild(row);
+        return;
+      }
+      const row = document.createElement("div");
+      row.className = "gswap-row";
+      const label = document.createElement("span");
+      label.textContent = ex.name + ":";
+      const sel = document.createElement("select");
+      sel.innerHTML =
+        `<option value="">Keep original</option>` +
+        ex.alts.map(a => `<option value="${a}">${EXERCISES[a].name}</option>`).join("");
+      sel.value = state.globalSwaps[baseId] || "";
+      sel.addEventListener("change", () => {
+        if (sel.value === "") delete state.globalSwaps[baseId];
+        else state.globalSwaps[baseId] = sel.value;
+        saveState();
+        renderSheet();
+        setStatus(sel.value === "" ? "Swap removed" : "All \"" + ex.name + "\" slots now use " + EXERCISES[sel.value].name);
+      });
+      row.appendChild(label);
+      row.appendChild(sel);
+      globalsEl.appendChild(row);
+    });
+  }
+
+  // ------------------------- Sheet render --------------------------
+  function renderSheet() {
+    sheetEl.innerHTML = "";
+    breakIdx = 0;
+    let panel = null;
+
+    items.forEach(item => {
+      if (item.type === "phase") {
+        attachPhase(item);
+        panel = null;
+      } else if (item.type === "break") {
+        attachBreak(item);
+        panel = null;
+      } else {
+        if (!panel) panel = openPanel("Workout");
+        attachExercise(item);
+      }
+    });
+
+    refreshProgress();
+
+    function openPanel(title) {
+      const p = document.createElement("div");
+      p.className = "panel";
+      p.innerHTML = `<h2>${title}</h2>`;
+      sheetEl.appendChild(p);
+      return p;
+    }
+
+    function attachPhase(item) {
+      const key = "phase-" + item.label;
+      const div = document.createElement("div");
+      div.className = "phase-row" + (state.completed[key] ? " done" : "");
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.className = "tick";
+      cb.checked = !!state.completed[key];
+      cb.addEventListener("change", () => {
+        state.completed[key] = cb.checked; saveState(); div.classList.toggle("done", cb.checked);
+      });
+      div.appendChild(cb);
+      div.insertAdjacentHTML("beforeend", `<span>${item.label}</span><span class="ptime">(${item.time})</span>`);
+      sheetEl.appendChild(div);
+    }
+
+    function attachBreak(item) {
+      const key = "break-" + (breakIdx++);
+      const div = document.createElement("div");
+      div.className = "break-row";
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.className = "tick";
+      cb.checked = !!state.completed[key];
+      cb.addEventListener("change", () => { state.completed[key] = cb.checked; saveState(); });
+      div.appendChild(cb);
+      div.insertAdjacentHTML("beforeend", `<span>💧 Water Break (${item.time}) — take it when you need it</span>`);
+      sheetEl.appendChild(div);
+    }
+
+    function attachExercise(item) {
+      const activeId = activeIdFor(item);
+      const base = EXERCISES[item.base];
+      const ex = EXERCISES[activeId];
+      const swapped = activeId !== item.base;
+      const viaGlobal = swapped && !(item.slot in state.slotOverrides);
+      const showWeight = ex.hasWeight || item.w;
+      const res = state.results[item.slot] || { r: "", w: "" };
+      const hist = history[activeId] || [];
+      const last = hist.length ? hist[hist.length - 1] : null;
+
+      const row = document.createElement("div");
+      row.className = "row" + (state.completed["slot-" + item.slot] ? " done" : "");
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.className = "tick";
+      cb.checked = !!state.completed["slot-" + item.slot];
+      cb.addEventListener("change", () => {
+        state.completed["slot-" + item.slot] = cb.checked;
+        saveState();
+        row.classList.toggle("done", cb.checked);
+        refreshProgress();
+      });
+
+      const mid = document.createElement("div");
+      const head = document.createElement("div");
+      head.className = "ex-head";
+      head.innerHTML =
+        `<span class="tag-slot">${String(item.slot + 1).padStart(2, "0")}</span>` +
+        `<span class="badge ${ex.muscle}">${ex.muscle.toUpperCase()}</span>` +
+        `<span class="ex-name">${ex.name}</span>` +
+        (swapped ? `<span class="replaces">replacing ${base.name}${viaGlobal ? " (global)" : ""}</span>` : "");
+      mid.appendChild(head);
+
+      // Expandable detail
+      const det = document.createElement("details");
+      det.className = "more";
+      const summ = document.createElement("summary");
+      summ.textContent = "Details & video";
+      det.appendChild(summ);
+      const body = document.createElement("div");
+      body.className = "more-body";
+      body.innerHTML =
+        `<div class="cues">${ex.cues}</div>` +
+        `<div class="last-note">Clip file: <em>videos/${activeId}.mp4</em>` +
+        (last ? ` · Last: ${last.r || "?"} reps @ ${last.w || "—"} (${last.date})` : "") + `</div>`;
+      const vid = document.createElement("video");
+      vid.controls = true; vid.loop = true; vid.muted = true; vid.playsInline = true;
+      vid.preload = "metadata";
+      const src = document.createElement("source");
+      src.src = "videos/" + activeId + ".mp4";
+      src.type = "video/mp4";
+      vid.appendChild(src);
+      src.addEventListener("error", () => {
+        vid.replaceWith(Object.assign(document.createElement("div"),
+          { className: "novideo", textContent: "No clip yet — add videos/" + activeId + ".mp4" }));
+      });
+      body.appendChild(vid);
+      det.appendChild(body);
+      mid.appendChild(det);
+
+      const right = document.createElement("div");
+      const swapRow = document.createElement("div");
+      swapRow.className = "sw-row";
+      const swapLabel = document.createElement("label");
+      swapLabel.textContent = "This slot:";
+      const sel = document.createElement("select");
+      const opts = [`<option value="__default">Default ${state.globalSwaps[item.base] ? "(" + EXERCISES[state.globalSwaps[item.base]].name + ")" : "(" + base.name + ")"}</option>`,
+                    `<option value="">Original: ${base.name}</option>`]
+        .concat(base.alts.map(a => `<option value="${a}">${EXERCISES[a].name}</option>`));
+      sel.innerHTML = opts.join("");
+      sel.value = (item.slot in state.slotOverrides) ? state.slotOverrides[item.slot] : "__default";
+      sel.addEventListener("change", () => {
+        if (sel.value === "__default") delete state.slotOverrides[item.slot];
+        else state.slotOverrides[item.slot] = sel.value;
+        saveState();
+        renderSheet();
+      });
+      swapRow.appendChild(swapLabel); swapRow.appendChild(sel);
+
+      const rw = document.createElement("div");
+      rw.className = "rw-inputs";
+      let rwHtml =
+        `<span><label>Reps</label><input type="text" inputmode="numeric" value="${res.r || ""}" data-k="r"></span>`;
+      if (showWeight) {
+        rwHtml += `<span><label>Weight / Band</label><input type="text" value="${res.w || ""}" data-k="w"></span>`;
+      }
+      rw.innerHTML = rwHtml;
+      rw.querySelectorAll("input").forEach(inp => {
+        inp.addEventListener("input", () => {
+          if (!state.results[item.slot]) state.results[item.slot] = { r: "", w: "" };
+          state.results[item.slot][inp.dataset.k] = inp.value;
+          saveState();
+        });
+      });
+
+      swapRow.appendChild(rw);
+      right.appendChild(swapRow);
+
+      row.appendChild(cb);
+      row.appendChild(mid);
+      row.appendChild(right);
+      panel.appendChild(row);
+    }
+  }
+
+  // ------------------------- Toolbar actions -----------------------
+  document.getElementById("clearTicksBtn").addEventListener("click", () => {
+    if (!confirm("Clear all ticked exercises and breaks? Your swaps and results are kept.")) return;
+    state.completed = {};
+    saveState();
+    renderSheet();
+    setStatus("Ticks cleared");
+  });
+
+  document.getElementById("finishBtn").addEventListener("click", () => {
+    const date = new Date().toISOString().slice(0, 10);
+    let recorded = 0;
+    items.filter(i => i.type === "ex").forEach(item => {
+      const res = state.results[item.slot];
+      if (state.completed["slot-" + item.slot] && res && (res.r || res.w)) {
+        const id = activeIdFor(item);
+        if (!history[id]) history[id] = [];
+        history[id].push({ date, r: res.r, w: res.w });
+        recorded++;
+      }
+    });
+    state.completed = {};
+    state.results = {};
+    saveState();
+    renderSheet();
+    setStatus("Session saved (" + recorded + " exercises logged). Ticks reset — swaps kept.");
+  });
+
+  document.getElementById("exportBtn").addEventListener("click", () => {
+    state.history = history;
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "p90x-chest-back-state.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  });
+
+  const importFile = document.getElementById("importFile");
+  document.getElementById("importBtn").addEventListener("click", () => importFile.click());
+  importFile.addEventListener("change", () => {
+    const f = importFile.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        state = Object.assign({ completed: {}, results: {}, globalSwaps: {}, slotOverrides: {}, history: {} }, data);
+        history = state.history || {};
+        saveState();
+        buildGlobalsPanel();
+        renderSheet();
+        setStatus("State imported");
+      } catch (e) {
+        alert("That file doesn't look like a valid state export.");
+      }
+      importFile.value = "";
+    };
+    reader.readAsText(f);
+  });
+
+  // ------------------------- Boot ----------------------------------
+  buildGlobalsPanel();
+  renderSheet();
+})();
+</script>
+</body>
+</html>
