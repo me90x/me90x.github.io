@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shoulders &amp; Arms — Interactive Worksheet</title>
+<style>
+  :root {
+    --bg: #121417;
+    --panel: #1c2026;
+    --panel2: #23282f;
+    --text: #e8eaed;
+    --dim: #9aa3ad;
+    --accent: #f5a623;
+    --accent2: #4fa3ff;
+    --done: #2e7d4f;
+    --border: #2e353d;
+    --shoulders: #8e7ae0;
+    --biceps: #e0784e;
+    --triceps: #4fa3ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    padding-bottom: 4rem;
+  }
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0.8rem 1rem;
+  }
+  h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.02em; }
+  h1 .disc { color: var(--dim); font-weight: 400; font-size: 0.9rem; }
+  #progWrap {
+    margin-top: 0.5rem; height: 8px;
+    background: var(--panel2); border-radius: 4px; overflow: hidden;
+  }
+  #progBar { height: 100%; width: 0%; background: var(--done); transition: width 0.25s; }
+  #progText { font-size: 0.78rem; color: var(--dim); margin-top: 0.3rem; }
+  main { max-width: 760px; margin: 0 auto; padding: 1rem; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+  button {
+    background: var(--panel2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.45rem 0.8rem; font-size: 0.83rem; cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--done); border-color: var(--done); color: #fff; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 1rem; overflow: hidden;
+  }
+  .panel h2 {
+    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--dim); padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid var(--border); background: var(--panel2);
+  }
+  details.globals { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; }
+  details.globals summary { padding: 0.7rem 0.9rem; cursor: pointer; font-size: 0.85rem; color: var(--dim); list-style: none; }
+  details.globals summary::before { content: "▸ "; }
+  details.globals[open] summary::before { content: "▾ "; }
+  .globals-body { padding: 0 0.9rem 0.9rem; display: grid; gap: 0.5rem; }
+  .gswap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; align-items: center; font-size: 0.85rem; }
+  select, input[type="text"], input[type="number"] {
+    background: var(--panel2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 5px;
+    padding: 0.35rem 0.5rem; font-size: 0.83rem; width: 100%;
+  }
+  select:focus, input:focus { outline: none; border-color: var(--accent2); }
+
+  .row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.6rem; align-items: center;
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .row:last-child { border-bottom: none; }
+  .row.done { background: rgba(46,125,79,0.13); }
+  .row.done .ex-name { color: var(--dim); text-decoration: line-through; }
+  input[type="checkbox"].tick {
+    width: 22px; height: 22px; accent-color: var(--done); cursor: pointer;
+  }
+  .ex-head { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .badge {
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em;
+    padding: 0.15rem 0.4rem; border-radius: 4px; color: #fff;
+  }
+  .badge.shoulders { background: var(--shoulders); }
+  .badge.biceps { background: var(--biceps); }
+  .badge.triceps { background: var(--triceps); }
+  .ex-name { font-weight: 600; font-size: 0.95rem; }
+  .replaces { font-size: 0.72rem; color: var(--accent); }
+  .tag-slot { font-size: 0.72rem; color: var(--dim); min-width: 1.6em; }
+
+  details.more { grid-column: 1 / -1; }
+  details.more summary {
+    cursor: pointer; font-size: 0.78rem; color: var(--accent2);
+    list-style: none; padding-top: 0.15rem; width: fit-content;
+  }
+  details.more summary::before { content: "▸ "; }
+  details.more[open] summary::before { content: "▾ "; }
+  .more-body { padding: 0.6rem 0 0.2rem; display: grid; gap: 0.6rem; }
+  .cues { font-size: 0.83rem; color: var(--dim); line-height: 1.45; }
+  video {
+    width: 100%; max-height: 320px; background: #000;
+    border-radius: 6px; border: 1px solid var(--border);
+  }
+  .novideo { font-size: 0.78rem; color: var(--dim); font-style: italic; }
+
+  .sw-row { display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap; }
+  .sw-row label { font-size: 0.7rem; color: var(--dim); }
+  .rw-inputs { display: flex; gap: 0.5rem; }
+  .rw-inputs label { font-size: 0.7rem; color: var(--dim); display: block; margin-bottom: 0.15rem; }
+  .rw-inputs input { width: 5.2rem; }
+  .last-note { font-size: 0.72rem; color: var(--dim); }
+
+  .break-row {
+    text-align: center; padding: 0.5rem; font-size: 0.8rem;
+    color: #b9a1ff; background: rgba(142,122,224,0.08);
+    border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border);
+    display: flex; justify-content: center; align-items: center; gap: 0.8rem;
+  }
+  .phase-row {
+    display: flex; align-items: center; gap: 0.7rem;
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 1rem;
+    font-weight: 600; font-size: 0.95rem;
+  }
+  .phase-row .ptime { color: var(--dim); font-weight: 400; font-size: 0.8rem; }
+  .phase-row.done { border-color: var(--done); }
+  #importFile { display: none; }
+  #statusMsg { font-size: 0.78rem; color: var(--dim); margin-left: auto; }
+  .foot-note { font-size: 0.75rem; color: var(--dim); margin-top: 0.5rem; line-height: 1.5; }
+  @media (max-width: 560px) {
+    .row { grid-template-columns: auto 1fr; }
+    .sw-row { grid-column: 1 / -1; justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Shoulders &amp; Arms <span class="disc">· Interactive Worksheet · Disc 3</span></h1>
+  <div id="progWrap"><div id="progBar"></div></div>
+  <div id="progText">0 / 0 complete</div>
+</header>
+<main>
+  <div class="toolbar">
+    <a href="main.html" style="text-decoration:none;"><button>← All Workouts</button></a>
+    <button class="primary" id="finishBtn">Finish &amp; Save Session</button>
+    <button id="clearTicksBtn">Clear Ticks</button>
+    <button id="exportBtn">Export JSON</button>
+    <button id="importBtn">Import JSON</button>
+    <input type="file" id="importFile" accept="application/json">
+    <span id="statusMsg"></span>
+  </div>
+
+  <details class="globals">
+    <summary>Global exercise swaps — change every occurrence in the routine</summary>
+    <div class="globals-body" id="globalsBody"></div>
+  </details>
+
+  <div id="sheet"></div>
+
+  <div class="panel">
+    <h2>Equipment Required</h2>
+    <div class="foot-note" style="padding:0.7rem 0.9rem;">
+      Weights or resistance bands · Bench or chair.
+      R = reps, W = weight, RT = right side, LT = left side.
+    </div>
+  </div>
+
+  <p class="foot-note">
+    Everything is stored in your browser's localStorage. Use Export JSON to back up or
+    move your swaps and history to another device. To add a demonstration clip, name it
+    after the exercise ID (shown under each exercise) and place it next to this file in a
+    <strong>videos/</strong> folder, e.g. <em>videos/alternating_shoulder_presses.mp4</em>.
+  </p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // ------------------------------------------------------------------
+  // Exercise library for Shoulders & Arms.
+  // fields: "rw" = reps+weight, "r" = reps only, "rl" = right/left sides.
+  // ------------------------------------------------------------------
+  const EXERCISES = {
+    alternating_shoulder_presses: { name: "Alternating Shoulder Presses", muscle: "shoulders", fields: "rw",
+      alts: ["arnold_press", "band_shoulder_press", "pike_pushup"],
+      cues: "Alternate arms, pressing each dumbbell from ear height to full extension. Keep the unused arm held at the top." },
+    arnold_press: { name: "Arnold Presses", muscle: "shoulders", fields: "rw", alts: [],
+      cues: "Start palms facing you at chest height, rotate outward as you press overhead, reverse on the way down." },
+    band_shoulder_press: { name: "Band Shoulder Press", muscle: "shoulders", fields: "rw", alts: [],
+      cues: "Stand on the band or anchor under feet, press the handles overhead with control." },
+    pike_pushup: { name: "Pike Push-Ups", muscle: "shoulders", fields: "r", alts: [],
+      cues: "Hips high in a pike, lower the head toward the floor between the hands. Great bodyweight shoulder swap." },
+
+    in_out_bicep_curls: { name: "In & Out Bicep Curls", muscle: "biceps", fields: "rw",
+      alts: ["hammer_curls", "band_bicep_curls", "zottman_curls"],
+      cues: "Curl one rep with arms at your sides, next rep with elbows flared out 45°. Alternate through the set." },
+    hammer_curls: { name: "Hammer Curls", muscle: "biceps", fields: "rw", alts: [],
+      cues: "Neutral grip (palms facing each other). Hits the brachialis and forearms." },
+    band_bicep_curls: { name: "Band Bicep Curls", muscle: "biceps", fields: "rw", alts: [],
+      cues: "Stand on the band, curl the handles, keep elbows pinned at your ribs." },
+    zottman_curls: { name: "Zottman Curls", muscle: "biceps", fields: "rw", alts: [],
+      cues: "Curl up palms-up, rotate palms-down at the top, lower slowly overhand." },
+
+    two_arm_triceps_kickback: { name: "Two-Arm Triceps Kickback", muscle: "triceps", fields: "rw",
+      alts: ["band_triceps_kickback", "close_grip_bench_press", "bench_dips"],
+      cues: "Hinge with a flat back, elbows glued high, extend both arms straight back and squeeze." },
+    band_triceps_kickback: { name: "Band Triceps Kickback", muscle: "triceps", fields: "rw", alts: [],
+      cues: "Same hinge position, band handle instead of dumbbells — light but constant tension." },
+    close_grip_bench_press: { name: "Close-Grip Bench Press", muscle: "triceps", fields: "rw", alts: [],
+      cues: "Hands shoulder-width, elbows tucked to the ribs. Heavier compound option." },
+    bench_dips: { name: "Bench Dips", muscle: "triceps", fields: "r", alts: [],
+      cues: "Hands on a bench behind you, shoulders down, lower until elbows near 90°." },
+
+    deep_swimmers_presses: { name: "Deep Swimmer's Presses", muscle: "shoulders", fields: "rw",
+      alts: ["dumbbell_shoulder_press", "band_shoulder_press"],
+      cues: "Sweep the weights wide in a breaststroke motion, then press straight overhead from ear height." },
+    dumbbell_shoulder_press: { name: "Dumbbell Shoulder Press", muscle: "shoulders", fields: "rw", alts: [],
+      cues: "Both arms together from ear level to lockout, core tight, no leaning back." },
+
+    full_supination_concentration_curls: { name: "Full Supination Concentration Curls", muscle: "biceps", fields: "rw",
+      alts: ["hammer_curls", "band_bicep_curls"],
+      cues: "Seated, elbow braced on inner thigh. Start palm-down and rotate to full palm-up through the curl." },
+
+    chair_dips: { name: "Chair Dips", muscle: "triceps", fields: "r",
+      alts: ["close_grip_bench_press", "diamond_pushup"],
+      cues: "Back to the chair, legs out, lower until elbows hit 90°, press without shrugging." },
+    diamond_pushup: { name: "Diamond Push-Ups", muscle: "triceps", fields: "r", alts: [],
+      cues: "Thumbs and fingers form a diamond under the chest, elbows glued in. Triceps burn." },
+
+    upright_rows: { name: "Upright Rows", muscle: "shoulders", fields: "rw",
+      alts: ["band_upright_row", "lateral_raises"],
+      cues: "Pull the weights straight up to chest height, elbows leading high. Stop if shoulders pinch." },
+    band_upright_row: { name: "Band Upright Row", muscle: "shoulders", fields: "rw", alts: [],
+      cues: "Stand on the band and pull the handles up the body, elbows leading." },
+    lateral_raises: { name: "Lateral Raises", muscle: "shoulders", fields: "rw", alts: [],
+      cues: "Raise out to the sides to shoulder height, slight elbow bend, control the lower." },
+
+    static_arm_curls: { name: "Static Arm Curls", muscle: "biceps", fields: "rw",
+      alts: ["hammer_curls", "band_bicep_curls"],
+      cues: "Hold one arm fixed at 90° and curl the other for the full set, then swap sides." },
+
+    flip_grip_twist_kickbacks: { name: "Flip-Grip Twist Triceps Kickbacks", muscle: "triceps", fields: "rw",
+      alts: ["band_triceps_kickback", "overhead_tricep_extension"],
+      cues: "Kick back while rotating the palm from up to down mid-rep. Two positions count as one rep." },
+    overhead_tricep_extension: { name: "Overhead Triceps Extension", muscle: "triceps", fields: "rw", alts: [],
+      cues: "Elbows close by your ears, lower the weight behind the head, extend straight up." },
+
+    seated_two_angle_flys: { name: "Seated Two-Angle Shoulder Flys", muscle: "shoulders", fields: "rw",
+      alts: ["lateral_raises", "band_lateral_raises"],
+      cues: "Lean at angle one for half the set, sit upright for the rest. Light weights, strict form." },
+    band_lateral_raises: { name: "Band Lateral Raises", muscle: "shoulders", fields: "rw", alts: [],
+      cues: "Band under feet, raise handles out to shoulder height like pouring two jugs." },
+
+    crouching_cohen_curls: { name: "Crouching Cohen Curls", muscle: "biceps", fields: "rw",
+      alts: ["hammer_curls", "band_bicep_curls"],
+      cues: "Crouch low, elbows braced inside the knees, curl slow and strict. Named after Mr Cohen, apparently." },
+
+    lying_down_triceps_extensions: { name: "Lying-Down Triceps Extensions", muscle: "triceps", fields: "rw",
+      alts: ["close_grip_bench_press", "band_pushdown"],
+      cues: "Lying back, lower the weights to beside your ears, elbows fixed pointing at the ceiling." },
+    band_pushdown: { name: "Band Pushdown", muscle: "triceps", fields: "rw", alts: [],
+      cues: "Band anchored overhead, elbows pinned at ribs, press down to full extension." },
+
+    in_out_straight_arm_flys: { name: "In & Out Straight-Arm Shoulder Flys", muscle: "shoulders", fields: "rw",
+      alts: ["band_lateral_raises", "pike_pushup"],
+      cues: "Light weights, straight arms: fly out wide, bring in crossing at the chest. Alternate angles as shown." },
+
+    congdon_curls: { name: "Congdon Curls", muscle: "biceps", fields: "rw",
+      alts: ["zottman_curls", "band_bicep_curls"],
+      cues: "Curl up, then at the top rotate palms down (like a Zottman) and lower slowly fighting the rotation." },
+
+    side_tri_rises: { name: "Side Tri-Rises", muscle: "triceps", fields: "rl",
+      alts: ["band_pushdown", "overhead_tricep_extension"],
+      cues: "Lying on your side, press the floor away with the top arm using just the triceps. Log Right and Left separately." }
+  };
+
+  // ------------------------------------------------------------------
+  // Routine transcribed from the Shoulders & Arms worksheet (Disc 3).
+  // Blocks repeat each trio twice consecutively, exactly like the sheet.
+  // ------------------------------------------------------------------
+  const ROUTINE = [
+    { type: "phase", label: "Warm-Up", time: "2:45 + 7:23" },
+
+    { base: "alternating_shoulder_presses" }, { base: "in_out_bicep_curls" }, { base: "two_arm_triceps_kickback" },
+    { base: "alternating_shoulder_presses" }, { base: "in_out_bicep_curls" }, { base: "two_arm_triceps_kickback" },
+    { type: "break", label: "Ballistic Stretch", time: "0:30" },
+
+    { base: "deep_swimmers_presses" }, { base: "full_supination_concentration_curls" }, { base: "chair_dips" },
+    { base: "deep_swimmers_presses" }, { base: "full_supination_concentration_curls" }, { base: "chair_dips" },
+    { type: "break", label: "Ballistic Stretch", time: "0:30" },
+
+    { base: "upright_rows" }, { base: "static_arm_curls" }, { base: "flip_grip_twist_kickbacks" },
+    { base: "upright_rows" }, { base: "static_arm_curls" }, { base: "flip_grip_twist_kickbacks" },
+    { type: "break", label: "Ballistic Stretch", time: "0:34" },
+
+    { base: "seated_two_angle_flys" }, { base: "crouching_cohen_curls" }, { base: "lying_down_triceps_extensions" },
+    { base: "seated_two_angle_flys" }, { base: "crouching_cohen_curls" }, { base: "lying_down_triceps_extensions" },
+    { type: "break", label: "Ballistic Stretch", time: "0:38" },
+
+    { base: "in_out_straight_arm_flys" }, { base: "congdon_curls" }, { base: "side_tri_rises" },
+    { base: "in_out_straight_arm_flys" }, { base: "congdon_curls" }, { base: "side_tri_rises" },
+
+    { type: "phase", label: "Cool Down", time: "3:29" }
+  ];
+
+  const LS_KEY = "p90x-shoulders-arms-v1";
+  let state = loadState();
+  let history = state.history || {};
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) { }
+    return { completed: {}, results: {}, globalSwaps: {}, slotOverrides: {}, history: {} };
+  }
+
+  function saveState() {
+    state.history = history;
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  let slotCounter = 0;
+  const items = ROUTINE.map(it => {
+    if (it.type) return it;
+    return { type: "ex", slot: slotCounter++, base: it.base };
+  });
+
+  function activeIdFor(item) {
+    if (item.slot in state.slotOverrides) {
+      const ov = state.slotOverrides[item.slot];
+      return ov === "" ? item.base : ov;
+    }
+    return state.globalSwaps[item.base] || item.base;
+  }
+
+  const sheetEl = document.getElementById("sheet");
+  const globalsEl = document.getElementById("globalsBody");
+  const statusMsg = document.getElementById("statusMsg");
+
+  function setStatus(msg) {
+    statusMsg.textContent = msg;
+    setTimeout(() => { statusMsg.textContent = ""; }, 3500);
+  }
+
+  let breakIdx = 0;
+
+  function refreshProgress() {
+    const exItems = items.filter(i => i.type === "ex");
+    const total = exItems.length;
+    const done = exItems.filter(i => state.completed["slot-" + i.slot]).length;
+    document.getElementById("progBar").style.width = total ? (done / total * 100) + "%" : "0%";
+    document.getElementById("progText").textContent = done + " / " + total + " exercises complete";
+  }
+
+  function buildGlobalsPanel() {
+    globalsEl.innerHTML = "";
+    const uniqueBases = [...new Set(items.filter(i => i.type === "ex").map(i => i.base))];
+    uniqueBases.forEach(baseId => {
+      const ex = EXERCISES[baseId];
+      if (!ex || ex.alts.length === 0) {
+        const row = document.createElement("div");
+        row.className = "gswap-row";
+        row.innerHTML = `<span>${ex ? ex.name : baseId}</span><span style="color:var(--dim);font-size:0.75rem;">no alternatives yet</span>`;
+        globalsEl.appendChild(row);
+        return;
+      }
+      const row = document.createElement("div");
+      row.className = "gswap-row";
+      const label = document.createElement("span");
+      label.textContent = ex.name + ":";
+      const sel = document.createElement("select");
+      sel.innerHTML =
+        `<option value="">Keep original</option>` +
+        ex.alts.map(a => `<option value="${a}">${EXERCISES[a].name}</option>`).join("");
+      sel.value = state.globalSwaps[baseId] || "";
+      sel.addEventListener("change", () => {
+        if (sel.value === "") delete state.globalSwaps[baseId];
+        else state.globalSwaps[baseId] = sel.value;
+        saveState();
+        renderSheet();
+        setStatus(sel.value === "" ? "Swap removed" : "All \"" + ex.name + "\" slots now use " + EXERCISES[sel.value].name);
+      });
+      row.appendChild(label);
+      row.appendChild(sel);
+      globalsEl.appendChild(row);
+    });
+  }
+
+  // Input fields for an exercise: rw / r / rl
+  function fieldDefs(fields) {
+    if (fields === "rl") return [{ k: "rt", label: "Right" }, { k: "lt", label: "Left" }];
+    if (fields === "r")  return [{ k: "r",  label: "Reps" }];
+    return [{ k: "r", label: "Reps" }, { k: "w", label: "Weight / Band" }];
+  }
+
+  function formatLast(fields, last) {
+    if (!last) return "";
+    if (fields === "rl") return ` · Last: R ${last.rt || "?"} / L ${last.lt || "?"} (${last.date})`;
+    if (fields === "r")  return ` · Last: ${last.r || "?"} reps (${last.date})`;
+    return ` · Last: ${last.r || "?"} reps @ ${last.w || "—"} (${last.date})`;
+  }
+
+  let blockNum = 0;
+
+  function renderSheet() {
+    sheetEl.innerHTML = "";
+    breakIdx = 0;
+    blockNum = 1;
+    let panel = null;
+
+    items.forEach(item => {
+      if (item.type === "phase") {
+        attachPhase(item);
+        panel = null;
+      } else if (item.type === "break") {
+        attachBreak(item);
+        panel = null;
+        blockNum++;
+      } else {
+        if (!panel) panel = openPanel("Block " + blockNum);
+        attachExercise(item);
+      }
+    });
+
+    refreshProgress();
+
+    function openPanel(title) {
+      const p = document.createElement("div");
+      p.className = "panel";
+      p.innerHTML = `<h2>${title}</h2>`;
+      sheetEl.appendChild(p);
+      return p;
+    }
+
+    function attachPhase(item) {
+      const key = "phase-" + item.label;
+      const div = document.createElement("div");
+      div.className = "phase-row" + (state.completed[key] ? " done" : "");
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.className = "tick";
+      cb.checked = !!state.completed[key];
+      cb.addEventListener("change", () => {
+        state.completed[key] = cb.checked; saveState(); div.classList.toggle("done", cb.checked);
+      });
+      div.appendChild(cb);
+      div.insertAdjacentHTML("beforeend", `<span>${item.label}</span><span class="ptime">(${item.time})</span>`);
+      sheetEl.appendChild(div);
+    }
+
+    function attachBreak(item) {
+      const key = "break-" + (breakIdx++);
+      const div = document.createElement("div");
+      div.className = "break-row";
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.className = "tick";
+      cb.checked = !!state.completed[key];
+      cb.addEventListener("change", () => { state.completed[key] = cb.checked; saveState(); });
+      div.appendChild(cb);
+      div.insertAdjacentHTML("beforeend",
+        `<span>🤸 ${item.label} (${item.time}) — tick when done</span>`);
+      sheetEl.appendChild(div);
+    }
+
+    function attachExercise(item) {
+      const activeId = activeIdFor(item);
+      const base = EXERCISES[item.base];
+      const ex = EXERCISES[activeId];
+      const swapped = activeId !== item.base;
+      const viaGlobal = swapped && !(item.slot in state.slotOverrides);
+      const fields = ex.fields || "rw";
+      const res = state.results[item.slot] || {};
+      const hist = history[activeId] || [];
+      const last = hist.length ? hist[hist.length - 1] : null;
+
+      const row = document.createElement("div");
+      row.className = "row" + (state.completed["slot-" + item.slot] ? " done" : "");
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.className = "tick";
+      cb.checked = !!state.completed["slot-" + item.slot];
+      cb.addEventListener("change", () => {
+        state.completed["slot-" + item.slot] = cb.checked;
+        saveState();
+        row.classList.toggle("done", cb.checked);
+        refreshProgress();
+      });
+
+      const mid = document.createElement("div");
+      const head = document.createElement("div");
+      head.className = "ex-head";
+      head.innerHTML =
+        `<span class="tag-slot">${String(item.slot + 1).padStart(2, "0")}</span>` +
+        `<span class="badge ${ex.muscle}">${ex.muscle.toUpperCase()}</span>` +
+        `<span class="ex-name">${ex.name}</span>` +
+        (swapped ? `<span class="replaces">replacing ${base.name}${viaGlobal ? " (global)" : ""}</span>` : "");
+      mid.appendChild(head);
+
+      const det = document.createElement("details");
+      det.className = "more";
+      const summ = document.createElement("summary");
+      summ.textContent = "Details & video";
+      det.appendChild(summ);
+      const body = document.createElement("div");
+      body.className = "more-body";
+      body.innerHTML =
+        `<div class="cues">${ex.cues}</div>` +
+        `<div class="last-note">Clip file: <em>videos/${activeId}.mp4</em>` +
+        formatLast(fields, last) + `</div>`;
+      const vid = document.createElement("video");
+      vid.controls = true; vid.loop = true; vid.muted = true; vid.playsInline = true;
+      vid.preload = "metadata";
+      const src = document.createElement("source");
+      src.src = "videos/" + activeId + ".mp4";
+      src.type = "video/mp4";
+      vid.appendChild(src);
+      src.addEventListener("error", () => {
+        vid.replaceWith(Object.assign(document.createElement("div"),
+          { className: "novideo", textContent: "No clip yet — add videos/" + activeId + ".mp4" }));
+      });
+      body.appendChild(vid);
+      det.appendChild(body);
+      mid.appendChild(det);
+
+      const right = document.createElement("div");
+      const swapRow = document.createElement("div");
+      swapRow.className = "sw-row";
+      const swapLabel = document.createElement("label");
+      swapLabel.textContent = "This slot:";
+      const sel = document.createElement("select");
+      const opts = [`<option value="__default">Default ${state.globalSwaps[item.base] ? "(" + EXERCISES[state.globalSwaps[item.base]].name + ")" : "(" + base.name + ")"}</option>`,
+                    `<option value="">Original: ${base.name}</option>`]
+        .concat(base.alts.map(a => `<option value="${a}">${EXERCISES[a].name}</option>`));
+      sel.innerHTML = opts.join("");
+      sel.value = (item.slot in state.slotOverrides) ? state.slotOverrides[item.slot] : "__default";
+      sel.addEventListener("change", () => {
+        if (sel.value === "__default") delete state.slotOverrides[item.slot];
+        else state.slotOverrides[item.slot] = sel.value;
+        saveState();
+        renderSheet();
+      });
+      swapRow.appendChild(swapLabel); swapRow.appendChild(sel);
+
+      const rw = document.createElement("div");
+      rw.className = "rw-inputs";
+      rw.innerHTML = fieldDefs(fields).map(f =>
+        `<span><label>${f.label}</label><input type="text" inputmode="numeric" value="${res[f.k] || ""}" data-k="${f.k}"></span>`
+      ).join("");
+      rw.querySelectorAll("input").forEach(inp => {
+        inp.addEventListener("input", () => {
+          if (!state.results[item.slot]) state.results[item.slot] = {};
+          state.results[item.slot][inp.dataset.k] = inp.value;
+          saveState();
+        });
+      });
+
+      swapRow.appendChild(rw);
+      right.appendChild(swapRow);
+
+      row.appendChild(cb);
+      row.appendChild(mid);
+      row.appendChild(right);
+      panel.appendChild(row);
+    }
+  }
+
+  document.getElementById("clearTicksBtn").addEventListener("click", () => {
+    if (!confirm("Clear all ticked exercises and stretches? Your swaps and results are kept.")) return;
+    state.completed = {};
+    saveState();
+    renderSheet();
+    setStatus("Ticks cleared");
+  });
+
+  document.getElementById("finishBtn").addEventListener("click", () => {
+    const date = new Date().toISOString().slice(0, 10);
+    let recorded = 0;
+    items.filter(i => i.type === "ex").forEach(item => {
+      const res = state.results[item.slot] || {};
+      const activeId = activeIdFor(item);
+      const ex = EXERCISES[activeId];
+      const hasData = fieldDefs(ex.fields || "rw").some(f => res[f.k]);
+      if (state.completed["slot-" + item.slot] && hasData) {
+        if (!history[activeId]) history[activeId] = [];
+        const entry = { date };
+        fieldDefs(ex.fields || "rw").forEach(f => { entry[f.k] = res[f.k] || ""; });
+        history[activeId].push(entry);
+        recorded++;
+      }
+    });
+    state.completed = {};
+    state.results = {};
+    saveState();
+    renderSheet();
+    setStatus("Session saved (" + recorded + " exercises logged). Ticks reset — swaps kept.");
+  });
+
+  document.getElementById("exportBtn").addEventListener("click", () => {
+    state.history = history;
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "p90x-shoulders-arms-state.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  });
+
+  const importFile = document.getElementById("importFile");
+  document.getElementById("importBtn").addEventListener("click", () => importFile.click());
+  importFile.addEventListener("change", () => {
+    const f = importFile.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        state = Object.assign({ completed: {}, results: {}, globalSwaps: {}, slotOverrides: {}, history: {} }, data);
+        history = state.history || {};
+        saveState();
+        buildGlobalsPanel();
+        renderSheet();
+        setStatus("State imported");
+      } catch (e) {
+        alert("That file doesn't look like a valid state export.");
+      }
+      importFile.value = "";
+    };
+    reader.readAsText(f);
+  });
+
+  buildGlobalsPanel();
+  renderSheet();
+})();
+</script>
+</body>
+</html>
